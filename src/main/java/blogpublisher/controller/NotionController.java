@@ -37,6 +37,11 @@ public class NotionController {
         return notionService.getPageChildren(pageId);
     }
 
+    @GetMapping("/page/{pageId}/content")
+    public String getPageContent(@PathVariable String pageId) throws Exception{
+        return notionService.getPageContent(pageId);
+    }
+
     @GetMapping("/database/{databaseId}")
     public String getDatabase(@PathVariable String databaseId){
         return notionService.getDatabase(databaseId);
@@ -45,6 +50,10 @@ public class NotionController {
     @GetMapping("/datasource/{dataSourceId}")
     public String queryDataSource(@PathVariable String dataSourceId){
         return notionService.queryDataSource(dataSourceId);
+    }
+    @GetMapping(value = "/page/{pageId}/html", produces = "text/html;charset=UTF-8")
+    public String getPageHtml(@PathVariable String pageId) throws Exception {
+        return notionService.getPageHtml(pageId);
     }
 
     @GetMapping("/posts")

@@ -132,6 +132,127 @@ public class NotionService {
         return posts;
     }
 
+    public String getPageContent(String pageId) throws Exception {
 
+        String response = notionRestClient.get()
+                .uri("/blocks/" + pageId + "/children")
+                .retrieve()
+                .body(String.class);
+
+        JsonNode root = objectMapper.readTree(response);
+
+        StringBuilder content = new StringBuilder();
+
+        for (JsonNode block : root.get("results")) {
+
+            String type = block.get("type").asText();
+
+            JsonNode blockData = block.get(type);
+
+            if (blockData == null) {
+                continue;
+            }
+
+            JsonNode richText = blockData.get("rich_text");
+
+            if (richText == null || !richText.isArray()) {
+                continue;
+            }
+
+            for (JsonNode text : richText) {
+
+                String plainText = text
+                        .get("plain_text")
+                        .asText();
+
+                content.append(plainText);
+            }
+
+            content.append("\n");
+        }
+
+        return content.toString();
+    }
+
+    public String getPageHtml(String pageId) throws Exception {
+
+        String response = notionRestClient.get()
+                .uri("/blocks/"+ pageId + "/children")
+                .retrieve()
+                .body(String.class);
+
+        JsonNode root = objectMapper.readTree(response);
+
+        StringBuilder html = new StringBuilder();
+
+        for (JsonNode block : root.get("results")) {
+            String type = block.get("type").asString();
+            JsonNode blockData = block.get(type);
+
+            if(blockData == null) {
+                continue;
+            }
+
+            JsonNode richText = blockData.get("rich_text");
+
+            StringBuilder textContent = new StringBuilder();
+
+            if(richText != null && richText.isArray()){
+                for (JsonNode text : richText) {
+                    textContent.append(
+                            text.get("plain_text").asString()
+                    );
+                }
+            }
+            String text = textContent.toString();
+
+            switch (type) {
+                case "heading_1":
+                    html.append("<h1>")
+                            .append(text)
+                            .append("</h1>");
+                    break;
+                case "heading_2":
+                    html.append("<h2>")
+                            .append(text)
+                            .append("</h2>");
+                    break;
+                case "heading_3":
+                    html.append("<h3>")
+                            .append(text)
+                            .append("</h3>");
+                    break;
+                case "paragraph":
+                    html.append("<p>")
+                            .append(text)
+                            .append("</p>");
+                    break;
+                case "bulleted_list_item":
+                    html.append("<ul><li>")
+                            .append(text)
+                            .append("</li></ul>");
+                    break;
+                case "numbered_list_item":
+                    html.append("<ol><li>")
+                            .append(text)
+                            .append("</li></ol>");
+                    break;
+                case "quote":
+                    html.append("<blockquote>")
+                            .append(text)
+                            .append("</blockquote>");
+                    break;
+                case "code":
+                    html.append("<pre><code>")
+                            .append(text)
+                            .append("</code></pre>");
+                    break;
+
+                default:
+                    break;
+            }
+        }
+        return html.toString();
+    }
 
 }

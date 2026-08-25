@@ -1,2 +1,2 @@
 notion:
-  token: ${NOTION_TOKEN}
+  token:
