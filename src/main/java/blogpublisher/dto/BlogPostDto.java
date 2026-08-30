@@ -14,4 +14,5 @@ public class BlogPostDto {
     private String status;
     private String category;
     private String createdDate;
+    private String content;
 }

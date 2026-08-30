@@ -117,12 +117,15 @@ public class NotionService {
                     .get("start")
                     .asText();
 
+            String content = getPageContent(pageId);
+
             BlogPostDto post = new BlogPostDto(
                     pageId,
                     title,
                     status,
                     category,
-                    createdDate
+                    createdDate,
+                    content
             );
 
             posts.add(post);
@@ -186,7 +189,7 @@ public class NotionService {
         StringBuilder html = new StringBuilder();
 
         for (JsonNode block : root.get("results")) {
-            String type = block.get("type").asString();
+            String type = block.get("type").asText();
             JsonNode blockData = block.get(type);
 
             if(blockData == null) {
@@ -200,7 +203,7 @@ public class NotionService {
             if(richText != null && richText.isArray()){
                 for (JsonNode text : richText) {
                     textContent.append(
-                            text.get("plain_text").asString()
+                            text.get("plain_text").asText()
                     );
                 }
             }
